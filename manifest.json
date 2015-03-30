@@ -1,0 +1,23 @@
+{
+	"name": "guocai is a doubi",
+	"version": "1.0",
+	"manifest_version": 2,
+	"description": "try to play guocai",
+	"page_action": {
+		"default_icon": "icon.png",
+		"default_title": "测试",
+		"default_popup": "popup.html",
+		"scripts": ["popup.js"]
+	},
+	"permissions": [
+		"tabs",
+		"http://localhost/"
+	],
+	"background": {
+		"scripts": ["jquery-2.0.0.min.js", "background.js"]
+	},
+	"content_scripts":[{
+		"matches":["http://weibo.com/*"],
+		"js":["jquery-2.0.0.min.js", "content_script.js"]
+	}]
+}
