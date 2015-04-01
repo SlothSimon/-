@@ -17,12 +17,12 @@ function checkForValidUrl (tabId, changeInfo, tab) {
 
 chrome.tabs.onUpdated.addListener(checkForValidUrl);
 
-var adata = {};
-adata.error = "加载中...";
+var data = {};
+data.error = "加载中...";
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     console.log(sender.tab ?
                 "from a content script:" + sender.tab.url :
                 "from the extension");
-    adata = request;
+    data = request;
   });

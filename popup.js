@@ -1,7 +1,7 @@
 window.addEventListener("pageshow", load);
 
 function load() {
-	var data = chrome.extension.getBackgroundPage().adata;
+	var data = chrome.extension.getBackgroundPage().data;
 	// $("#message").text("ddddddddd");
 	if(data.error){
 		$("#message").text(data.error);
@@ -10,6 +10,9 @@ function load() {
 		$("#message").hide();
 		$("#content-type").text(data.type);
 		$("#content-author").text(data.author);
+		$("#content-linkclick").text(data.linkClick);
+		$("#content-time").text(data.totaltime);
+		$("#content-subject").text(data.subjectID);
 	}
 };
 
