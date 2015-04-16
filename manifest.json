@@ -11,13 +11,13 @@
 	},
 	"permissions": [
 		"tabs",
-		"http://localhost/"
+		"http://simonproject.sinaapp.com/"
 	],
 	"background": {
 		"scripts": ["jquery-2.0.0.min.js", "background.js"]
 	},
 	"content_scripts":[{
-		"matches":["http://weibo.com/*"],
+		"matches":["http://weibo.com/u/*/home?*", "http://weibo.com/mygroups?*"],
 		"js":["jquery-2.0.0.min.js", "content_script.js"]
 	}]
 }
