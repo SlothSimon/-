@@ -6,18 +6,22 @@
 	"page_action": {
 		"default_icon": "icon.png",
 		"default_title": "测试",
-		"default_popup": "popup.html",
-		"scripts": ["popup.js"]
+		"default_popup": "login.html",
+		"scripts": ["js/addaccount.js", "js/store.js", "js/urs.js"]
 	},
 	"permissions": [
 		"tabs",
 		"http://simonproject.sinaapp.com/"
 	],
 	"background": {
-		"scripts": ["jquery-2.0.0.min.js", "background.js"]
+		"scripts": ["js/jquery-2.0.0.min.js", "js/background.js"]
 	},
 	"content_scripts":[{
 		"matches":["http://weibo.com/u/*/home?*", "http://weibo.com/mygroups?*"],
-		"js":["jquery-2.0.0.min.js", "content_script.js"]
-	}]
+		"js":["js/jquery-2.0.0.min.js", "js/content_script.js"]
+	}],
+	"web_accessible_resources": [
+		"weibo.html",
+		"product.html"
+	]
 }

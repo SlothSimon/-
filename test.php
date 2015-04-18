@@ -2,30 +2,24 @@
 header("content-type:application/json; charset:utf-8");
 date_default_timezone_set("Asia/Shanghai");
 $firstAccess = null;
-$rawData = file_get_contents("php://input");
-$parameters = json_decode($rawData);
-if($parameters){
-	if(isset($parameters->url)){
-		$currMd5 = md5($parameters->url);
-		$handle = fopen("history.txt", "r+");
-		if ($handle) {
-			// while (($line = fgets($handle, 4096)) !== false) {
-			// 	if(0===strpos($line, $currMd5)){
-			// 		$firstAccess = trim(substr($line, 33));
-			// 		break;
-			// 	}
-			// }
-			if(!$firstAccess){
-				$firstAccess = date("Y-m-d H:i");
-				fwrite($handle, $currMd5." ".$firstAccess." ".$rawData."\r\n");
-			}
-			fclose($handle);
-		}
-		else {
-			exit(json_encode(array ('error'=>'服务器意外错误.')));
-		}
-		exit(json_encode(array ('success'=>$firstAccess)));
+$url = $_POST["url"];
+if($_POST){
+	if(isset($_POST["url"])){
+		$mysql = new SaeMysql();
+        $linkclick = date('Y-m-d H:i:s',$_POST["linkclick"]/1000);
+        $totaltime = $_POST["totaltime"];
+        $author = $_POST["author"];
+        $subjectID = $_POST["subjectID"];
+        $sql = "insert into request (subjectID, author, linkclick, totaltime) values('$subjectID','$author', '$linkclick', '$totaltime')";
+        $mysql->runSql($sql);
+        $mysql->closeDb();
+        exit(json_encode(array ('success'=>"finished", 'totaltime'=>$totaltime, 'linkclick'=>$linkclick)));
 	}
+    else
+        exit(json_encode(array ('error'=>"false start")));
 }
-exit(json_encode(array ('error'=>'请求不正确.')));
+else {
+	exit(json_encode(array ('error'=>'no parameters')));
+}
+exit(json_encode(array ('error'=>'post error.')));
 ?>
