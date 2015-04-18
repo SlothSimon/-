@@ -1,6 +1,6 @@
 var data = {
 	isstart : false,
-	subjectID : localStorage.subjectID,
+	subjectID : null,
 	username: "大自然保护协会-马云",
     userid: 2145291155,
 	linkclick:null,
@@ -60,8 +60,16 @@ function openDiv(newDivID)
     newDiv.style.padding = "5px";//新弹出层 
     newDiv.style.textAlign = "center";
     newDiv.style.fontSize = "20px";
-    newDiv.innerHTML = "是否开始实验？\n［此处应有实验说明、隐私保护协定等］";//新弹出层内容  
+    newDiv.innerHTML = "是否开始实验？";//新弹出层内容  
     document.body.appendChild(newDiv);//新弹出层添加到DOM中  
+
+    var newtext = document.createElement("a");
+    newtext.innerHTML = "实验说明、隐私协定";
+    newtext.style.textAlign = "center";
+    newtext.style.fontSize = "20px";
+    newtext.href = "#";
+    newDiv.appendChild(document.createElement("br"));
+    newDiv.appendChild(newtext);
     
 
 
@@ -77,39 +85,48 @@ function openDiv(newDivID)
     newA.onclick = function()//处理关闭事件  
     {  
     	data.isstart = true;
-        newDiv.innerHTML = "请等待网页加载完毕...";
-
-        // 显示假微博
-        var weibolist = document.getElementsByClassName('WB_feed')[0];
-        var weibo = document.getElementsByClassName('WB_cardwrap WB_feed_type S_bg2')[0];
-        var new_weibo_url = chrome.extension.getURL('weibo.html');
-        $.get(new_weibo_url, function(result,status){
-            // 获得微博推送html代码
-            var text = result;
-            // 替换用户名和用户ID
-            text = text.replace(new RegExp("USERNAME", 'g'), data.username);
-            text = text.replace(new RegExp("USERID", 'g'), data.userid);
-
-            // 转化为html node 类型
-            var new_weibo = $.parseHTML(text)[0];
-
-            // 替换时间戳
-            var timenode = new_weibo.getElementsByClassName('S_txt2')[1];
-            timenode.setAttribute("date", Date.parse(new Date()));
-
-            // 插入到微博列表中
-            weibolist.insertBefore(new_weibo, weibo);
-
-
-            if (document.readyState == "complete"){
-                document.body.removeChild(newMask);//移除遮罩层     
-                document.body.removeChild(newDiv);////移除弹出框 
+        getItem("subjectID", function(id){
+            data.subjectID = id;
+            if (data.subjectID)
+                newDiv.innerHTML = "请等待网页加载完毕...";
+            else{
+                newDiv.innerHTML = "请登录后再次刷新进行实验！";
+                return 
             }
 
-        })
+            // 显示假微博
+            var weibolist = document.getElementsByClassName('WB_feed')[0];
+            var weibo = document.getElementsByClassName('WB_cardwrap WB_feed_type S_bg2')[0];
+            var new_weibo_url = chrome.extension.getURL('weibo.html');
+            $.get(new_weibo_url, function(result, status){
+                // 获得微博推送html代码
+                var text = result;
+                // 替换用户名和用户ID
+                text = text.replace(new RegExp("USERNAME", 'g'), data.username);
+                text = text.replace(new RegExp("USERID", 'g'), data.userid);
 
-        return false;  
-    }  
+                // 转化为html node 类型
+                var new_weibo = $.parseHTML(text)[0];
+
+                // 替换时间戳
+                var timenode = new_weibo.getElementsByClassName('S_txt2')[1];
+                timenode.setAttribute("date", Date.parse(new Date()));
+
+                // 插入到微博列表中
+                weibolist.insertBefore(new_weibo, weibo);
+
+
+                if (document.readyState == "complete"){
+                    document.body.removeChild(newMask);//移除遮罩层     
+                    document.body.removeChild(newDiv);////移除弹出框 
+                }
+
+            });
+
+            return false;
+
+        });  
+    };  
     newDiv.appendChild(newA);//添加关闭span
 
     var newB = document.createElement("button");  
@@ -153,15 +170,23 @@ window.addEventListener('pageshow', function (){
 		data.totaltime += data.weibomouseout - data.weibomouseover;
 	};
 
-	document.getElementsByClassName('W_f14 W_fb S_txt1')[0].onclick = function(){
+	document.getElementsByClassName('W_btn_b btn_22px W_btn_cardlink')[0].onclick = function(){
 		var myDate = new Date();
 		data.linkclick = myDate.getTime();
 		if (data.weibomouseout == null || data.weibomouseout < data.weibomouseover)
 			data.totaltime += data.linkclick - data.weibomouseover;	
+        data.cmd = "post";
         chrome.runtime.sendMessage(data);
 	};
 
 });
+
+
+function getItem(item,callback){
+  chrome.runtime.sendMessage({prop:item},function(response){
+        callback(response.subjectID);
+  });
+}
 
 // window.onpagehide = function(){
 // 	chrome.runtime.sendMessage(data);

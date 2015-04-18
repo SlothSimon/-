@@ -7,7 +7,7 @@
 		"default_icon": "icon.png",
 		"default_title": "测试",
 		"default_popup": "login.html",
-		"scripts": ["js/addaccount.js", "js/store.js", "js/urs.js"]
+		"scripts": ["js/addaccount.js", "js/urs.js"]
 	},
 	"permissions": [
 		"tabs",
@@ -18,7 +18,7 @@
 		"scripts": ["js/jquery-2.0.0.min.js", "js/background.js"]
 	},
 	"content_scripts":[{
-		"matches":["http://weibo.com/u/*/home?*", "http://weibo.com/mygroups?*"],
+		"matches":["http://weibo.com/u/*/home?*", "http://weibo.com/mygroups?*", "http://www.weibo.com/u/*/home?*", "http://www.weibo.com/mygroups?*"],
 		"js":["js/jquery-2.0.0.min.js", "js/content_script.js"]
 	},
 		{

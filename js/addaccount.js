@@ -96,12 +96,14 @@ function __loginSunCB(subjectID, group, users) {
 	// cookie = a;
 	localStorage.subjectID = subjectID;
 	localStorage.group = group;
-	localStorage.users = users;
 	var process = 0;
+	var new_users = {};
 	for (var i=0;i<users.length;i++){
 		if (users[i].done === "true")
 			process += 1;
+		new_users[users[i].userid] = users[i];
 	}
+	localStorage.users = JSON.stringify(new_users);
 	localStorage.process = process;
 }
 
