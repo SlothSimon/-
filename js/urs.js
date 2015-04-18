@@ -81,9 +81,8 @@ if (!URS) {
 				if (v && typeof(v) === "object"){
 					s = v["status"];
 					if ("success" === s) {
-						var u = v["group"];
 						if (k && typeof(k) === "function") {
-							k(h, u);
+							k(h, v["group"], v["users"]);
 						}
 						return;
 					}

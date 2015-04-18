@@ -85,18 +85,24 @@ function __onAddAccount() {
 		onFail: __loginFailCB
 	});
 	if (flag) {
-		self.location = "info.html";
-		
+		self.location = "info.html";		
 	} else {
 		__showError(tip);
 	}
 }
 
-function __loginSunCB(subjectID, group) {
+function __loginSunCB(subjectID, group, users) {
 	flag = true;
 	// cookie = a;
 	localStorage.subjectID = subjectID;
 	localStorage.group = group;
+	localStorage.users = users;
+	var process = 0;
+	for (var i=0;i<users.length;i++){
+		if (users[i].done === "true")
+			process += 1;
+	}
+	localStorage.process = process;
 }
 
 function __loginFailCB(errorcode) {

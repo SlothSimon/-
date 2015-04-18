@@ -11,6 +11,7 @@
 	},
 	"permissions": [
 		"tabs",
+		"http://weibo.com/",
 		"http://simonproject.sinaapp.com/"
 	],
 	"background": {
@@ -19,7 +20,12 @@
 	"content_scripts":[{
 		"matches":["http://weibo.com/u/*/home?*", "http://weibo.com/mygroups?*"],
 		"js":["js/jquery-2.0.0.min.js", "js/content_script.js"]
-	}],
+	},
+		{
+			"matches": ["http://simonproject.sinaapp.com/product.html*"],
+			"js": ["js/jquery-2.0.0.min.js", "js/track.js"]
+			}
+	],
 	"web_accessible_resources": [
 		"weibo.html",
 		"product.html"

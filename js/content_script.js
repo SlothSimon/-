@@ -17,17 +17,7 @@ var data = {
     url : window.location.href,
 };
 
-// openDiv("test");
-
-// product
-// var product_url = chrome.extension.getURL('product.html');
-// $.get(product_url, function(result,status){
-//     var product = $.parseHTML(result);
-
-//     document.body.appendChild(product[0]);
-//     document.body.appendChild(product[1]);
-//     document.body.appendChild(product[2]);
-// });
+openDiv("test");
 
 function openDiv(newDivID)  
    {  

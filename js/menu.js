@@ -10,7 +10,6 @@
 
 window.addEventListener('pageshow', function (){
 	document.getElementsByClassName("js-account")[0].text = "被试ID： " + localStorage.subjectID;
-	localStorage.process = 0;
 	document.getElementsByClassName("process")[0].text = "实验进度： " + localStorage.process + " / 5";
 	document.getElementById("addAccount").onclick = function (){
 		localStorage.removeItem("subjectID");
@@ -18,7 +17,6 @@ window.addEventListener('pageshow', function (){
 		self.location = "login.html";
 	};
 	document.getElementsByClassName("line1")[0].focus();
-	document.body.focus();
 	// document.getElementsByClassName("line1")[0].blur();
 })
 // function _$init() {
