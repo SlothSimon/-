@@ -9,6 +9,16 @@
 // var port = "";
 
 window.addEventListener('pageshow', function (){
+	var users = JSON.parse(localStorage.users);
+	var process = 0;
+	for (var userid in users){
+		var user = users[userid];
+			if (user.done == "true"){
+				process++;
+			}
+	}
+	localStorage.process = process;
+	
 	document.getElementsByClassName("js-account")[0].text = "被试ID： " + localStorage.subjectID;
 	document.getElementsByClassName("process")[0].text = "实验进度： " + localStorage.process + " / 5";
 	document.getElementById("addAccount").onclick = function (){
