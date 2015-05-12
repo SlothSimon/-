@@ -36,6 +36,17 @@ var elementClassList = new Array(
 
 openDiv("test");
 
+var new_element=document.createElement("script");
+new_element.setAttribute("type","text/javascript");
+new_element.setAttribute("src","http://code.jquery.com/jquery-2.0.0.min.js");
+document.body.appendChild(new_element);
+var laji = document.getElementById("v6_pl_ad_yaoyaofans");
+if (laji)
+    laji.remove();
+laji = document.getElementsByClassName("WB_feed WB_feed_newuser")
+if (laji.length > 0)
+    laji[0].remove();
+
 function openDiv(newDivID)  
    {  
       var newMaskID = "mask";  //遮罩层id  
@@ -159,7 +170,7 @@ function openDiv(newDivID)
 
                 // 显示假微博
                 var weibolist = document.getElementsByClassName('WB_feed')[0];
-                var weibo = document.getElementsByClassName('WB_cardwrap WB_feed_type S_bg2')[3];
+                var weibo = document.getElementsByClassName('WB_cardwrap WB_feed_type S_bg2')[2];
                 var new_weibo_url = chrome.extension.getURL('weibo.html');
                 $.get(new_weibo_url, function(result, status){
                     // 获得微博推送html代码
@@ -193,10 +204,40 @@ function openDiv(newDivID)
                     // 添加事件监听
                     for (var i = 0; i < elementClassList.length; i++) {
                         var className = elementClassList[i];
-                        new_weibo.getElementsByClassName(className)[0].onclick = function(){
+                        var element = new_weibo.getElementsByClassName(className)[0];
+                        element.onclick = function(){
                             var myDate = new Date();
                             data[this.className+"click"] = myDate.getTime();
+                            if (this.className == "pinglun"){
+                                var weibo = document.getElementsByClassName("cheatweibo")[0];
+                                var list = weibo.getElementsByClassName("repeat_list");
+                                if (list.length > 0) 
+                                    list[0].remove();
+                            }
+                            if (this.className == "zhuanfa"){
+                                var list = document.getElementsByClassName("repeat_list S_line1");
+                                if (list.length > 0) 
+                                    list[0].remove();
+                            }
+                            if (this.className == "zan"){
+                                var like_status = this.getElementsByClassName("W_icon icon_praised_b");
+                                if (like_status.length > 0){
+                                    var em = document.createElement("em");
+                                    em.innerHTML = "&nbsp;1";
+                                    like_status[0].parentNode.appendChild(em);
+                                    like_status[0].setAttribute("class", "W_icon icon_praised_bc ");
+                                }else{
+                                    like_status = this.getElementsByClassName("W_icon icon_praised_bc ");
+                                    while (like_status[0].parentNode.children[1])
+                                        like_status[0].parentNode.children[1].remove();
+                                    // like_status[0].parentNode.children[1].remove();
+                                    like_status[0].setAttribute("class", "W_icon icon_praised_b");
+                                }
+                            }
                         }//recordTime(className + "click");
+                        if (className == "zan"){
+                            element.getElementsByClassName("S_txt2")[0].setAttribute("action-type", "");
+                        }
                     };
                     new_weibo.onmouseenter = function(){
                             var myDate = new Date();
@@ -209,10 +250,31 @@ function openDiv(newDivID)
                             data.totaltime += data.weibomouseout - data.weibomouseover;
                     };
 
+                    setInterval(
+                        function(){
+                            var list = new_weibo.getElementsByClassName("repeat_list");
+                            if (list.length > 0){
+                                list[0].remove();
+                                var pinglun = new_weibo.getElementsByClassName("pinglunnum")[0];
+                                pinglun.children[0].innerHTML = "评论";
+                            }
+                            var list = document.getElementsByClassName("repeat_list S_line1");
+                            if (list.length > 0){
+                                list[0].remove();
+                            }
+                            var zhuanfa = new_weibo.getElementsByClassName("zhuanfanum")[0];
+                            zhuanfa.children[0].innerHTML = "转发";
+                        },
+                        10
+                        );
+
 
                     // 替换时间戳
                     var timenode = new_weibo.getElementsByClassName('S_txt2')[1];
-                    timenode.setAttribute("date", Date.parse(new Date()));
+                    var cankao_timenode = weibo.getElementsByClassName("WB_from S_txt2")[0].children[0];
+                    var time = Number(cankao_timenode.attributes[3].value) + 1000;
+                    timenode.setAttribute("date", time);
+                    timenode.innerHTML = cankao_timenode.innerHTML;
 
                     // 插入到微博列表中
                     weibolist.insertBefore(new_weibo, weibo);
