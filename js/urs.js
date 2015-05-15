@@ -82,7 +82,7 @@ if (!URS) {
 					s = v["status"];
 					if ("success" === s) {
 						if (k && typeof(k) === "function") {
-							k(h, v["group"], v["users"]);
+							k(h, v["group"], v["users"], v["lastDate"]);
 						}
 						return;
 					}

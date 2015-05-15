@@ -1,11 +1,11 @@
 {
-	"name": "guocai is a doubi",
-	"version": "1.0",
+	"name": "Experiment Extension By SlothSimon",
+	"version": "1.1",
 	"manifest_version": 2,
-	"description": "try to play guocai",
-	"page_action": {
+	"description": "To collect the data from users on weibo.com.",
+	"browser_action": {
 		"default_icon": "icon.png",
-		"default_title": "测试",
+		"default_title": "实验",
 		"default_popup": "login.html",
 		"scripts": ["js/addaccount.js", "js/urs.js"]
 	},
@@ -18,7 +18,7 @@
 		"scripts": ["js/jquery-2.0.0.min.js", "js/background.js"]
 	},
 	"content_scripts":[{
-		"matches":["http://weibo.com/u/*/home?*", "http://weibo.com/mygroups?*", "http://www.weibo.com/u/*/home?*", "http://www.weibo.com/mygroups?*"],
+		"matches":["http://weibo.com/u/*/home*", "http://weibo.com/mygroups*", "http://www.weibo.com/u/*/home*", "http://www.weibo.com/mygroups*", "http://weibo.com/*/home*", "http://www.weibo.com/*/home*"],
 		"js":["js/jquery-2.0.0.min.js", "js/content_script.js"]
 	},
 		{

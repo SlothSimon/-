@@ -91,20 +91,23 @@ function __onAddAccount() {
 	}
 }
 
-function __loginSunCB(subjectID, group, users) {
+function __loginSunCB(subjectID, group, users, lastDate) {
 	flag = true;
 	// cookie = a;
 	localStorage.subjectID = subjectID;
 	localStorage.group = group;
-	var process = 0;
-	var new_users = {};
-	for (var i=0;i<users.length;i++){
-		if (users[i].done === "true")
-			process += 1;
-		new_users[users[i].userid] = users[i];
+	localStorage.lastDate = lastDate;
+	if (users){
+		var process = 0;
+		var new_users = {};
+		for (var i=0;i<users.length;i++){
+			if (users[i].done === "true")
+				process += 1;
+			new_users[users[i].userid] = users[i];
+		}
+		localStorage.users = JSON.stringify(new_users);
+		localStorage.process = process;
 	}
-	localStorage.users = JSON.stringify(new_users);
-	localStorage.process = process;
 }
 
 function __loginFailCB(errorcode) {

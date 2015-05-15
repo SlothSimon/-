@@ -17,6 +17,7 @@ var data = {
 	weibomouseover:null,
 	weibomouseout:null,
 	totaltime:0,
+    date:null,
     url : window.location.href,
 };
 
@@ -33,8 +34,18 @@ var elementClassList = new Array(
     "jubao",
     "pingbiguanjianci"
 );
+var jiazai = null;
 
-openDiv("test");
+ getItem("process", function(param){
+    if (param.process < 5){
+        var now = new Date();
+        now = now.toLocaleDateString();
+        if (now != param.lastDate){
+            openDiv("test");
+        }   
+    }
+ });
+// openDiv("test");
 
 var new_element=document.createElement("script");
 new_element.setAttribute("type","text/javascript");
@@ -132,8 +143,7 @@ function openDiv(newDivID)
     newA.innerHTML = "开始实验";  
     newA.onclick = function()//处理关闭事件  
     {  
-    	data.isstart = true;
-
+        data.isstart = true;
         // 获取推送的博主
         getItem("subjectID", function(param){
 
@@ -143,7 +153,8 @@ function openDiv(newDivID)
             }else{
 
                 window.onbeforeunload = function(){
-                    return "确定结束本次实验？";
+                    if (jiazai == false)
+                        return "确定结束本次实验？";
                 };
 
                 window.onunload = function(){
@@ -153,12 +164,18 @@ function openDiv(newDivID)
                         if (data.weibomouseover != null)
                             data.totaltime += end - data.weibomouseover;
                     data.cmd = "post";
-                    chrome.runtime.sendMessage(data);
+                    if (jiazai == false){
+                        var now = new Date();
+                        data.date = now.toLocaleDateString();
+                        chrome.runtime.sendMessage(data);
+                    }
                 };
 
                 data.subjectID = param.subjectID;
-                if (data.subjectID)
-                    newDiv.innerHTML = "请等待网页加载完毕...";
+                if (data.subjectID){
+                    newDiv.innerHTML = "请等待网页加载完毕...<br>若等待时间超过1分钟，请刷新！";
+                    jiazai = true;
+                }
                 else{
                     newDiv.innerHTML = "请登录后再次刷新进行实验！";
                     return ;
@@ -170,7 +187,7 @@ function openDiv(newDivID)
 
                 // 显示假微博
                 var weibolist = document.getElementsByClassName('WB_feed')[0];
-                var weibo = document.getElementsByClassName('WB_cardwrap WB_feed_type S_bg2')[2];
+                var weibo = document.getElementsByClassName('WB_cardwrap WB_feed_type S_bg2')[1];
                 var new_weibo_url = chrome.extension.getURL('weibo.html');
                 $.get(new_weibo_url, function(result, status){
                     // 获得微博推送html代码
@@ -184,7 +201,7 @@ function openDiv(newDivID)
                     var friends = param.userlist;
 
                     if (friends && friends.length > 0){
-                        var prefix = '<div class="W_arrow_bor W_arrow_bor_t"><i class="S_bg1_br"></i></div><div class="expand S_bg1" style="width: 230px;"><div class="content"><div class="layer_emotion" node-type="inner"></br><a>&nbsp;&nbsp;您关注的以下用户也购买了该产品：</a><ul class="emotion_list clearfix" node-type="faceList">';
+                        var prefix = '<div class="W_arrow_bor W_arrow_bor_t"><i class="S_bg1_br"></i></div><div class="expand S_bg1" style="width: 230px;"><div class="content"><div class="layer_emotion" node-type="inner"></br><a style="color:#000000">&nbsp;&nbsp;您关注的以下用户也购买了该产品：</a><ul class="emotion_list clearfix" node-type="faceList">';
                         var backfix = '</ul></div></div></div>';
                         var user = '<li uid="USERID"><a href="/u/USERID"><img src="http://tp4.sinaimg.cn/USERID/50/5724208507/0" alt="USERNAME" title="USERNAME"></a></li>'
                         for (var i = 0; i < friends.length; i++){
@@ -264,6 +281,32 @@ function openDiv(newDivID)
                             }
                             var zhuanfa = new_weibo.getElementsByClassName("zhuanfanum")[0];
                             zhuanfa.children[0].innerHTML = "转发";
+
+                            var node = $("[title$='测试1号2015']")
+                            if (node.length > 0){
+                                node = node[0];
+                                node.innerHTML = "@" + param.username;
+                                node.href = "/u/" + param.userid +"?from=feed&loc=nickname";
+                                node.setAttribute("nick-name", param.username);
+                                node.setAttribute("usercard", "id=" + param.userid);
+                                var str = '我在微商城购买了GlassRock。<span class="link"><a class="W_btn_b btn_22px W_btn_cardlink" title="iGlasses" href="http://simonproject.sinaapp.com/product.html" action-type="feed_list_url" alt="#"><i class="W_ficon ficon_cd_link S_ficon">O</i><i class="W_vline S_line1"></i><em class="W_autocut S_link1">点击了解：GlassRock</em></a></span>';
+                                if (node.parentNode.parentNode.children[1])
+                                    node.parentNode.parentNode.children[1].innerHTML = str;
+                                else
+                                    node.parentNode.parentNode.children[0].children[1].children[0].innerHTML = str;
+                                
+                                // 图片
+                                var pic = node.parentNode.parentNode.children[2];
+                                if (pic)
+                                    pic.getElementsByClassName("bigcursor")[1].src = "http://simonproject.sinaapp.com/glasses.jpg";
+
+                                // 时间戳
+                                if (node.parentNode.className != "getTogether-txt")
+                                    var t = node.parentNode.parentNode.children[4].children[1].children[0];
+                                if (time && t) 
+                                    t.setAttribute("date", time);
+                                node.title = param.username;
+                            }
                         },
                         10
                         );
@@ -272,17 +315,24 @@ function openDiv(newDivID)
                     // 替换时间戳
                     var timenode = new_weibo.getElementsByClassName('S_txt2')[1];
                     var cankao_timenode = weibo.getElementsByClassName("WB_from S_txt2")[0].children[0];
-                    var time = Number(cankao_timenode.attributes[3].value) + 1000;
+                    for (var x=0;x < cankao_timenode.attributes.length;x ++){
+                        if (cankao_timenode.attributes[x].localName == "date"){
+                           var time = Number(cankao_timenode.attributes[x].value) + 1000;
+                           break;
+                        }
+                    }
                     timenode.setAttribute("date", time);
                     timenode.innerHTML = cankao_timenode.innerHTML;
 
                     // 插入到微博列表中
+                    weibo = document.getElementsByClassName('WB_cardwrap WB_feed_type S_bg2')[2];
                     weibolist.insertBefore(new_weibo, weibo);
 
 
                     if (document.readyState == "complete"){
                         document.body.removeChild(newMask);//移除遮罩层     
                         document.body.removeChild(newDiv);////移除弹出框 
+                        jiazai = false;
                     }
 
                 });
@@ -308,10 +358,16 @@ function openDiv(newDivID)
      }  
      newDiv.appendChild(newB);//添加关闭span 
 
-     getItem("process", function(process){
-        if (process >= 5){
+     getItem("process", function(param){
+        if (param.process >= 5){
             document.body.removeChild(newMask);//移除遮罩层     
             document.body.removeChild(newDiv);////移除弹出框  
+        }
+        var now = new Date();
+        now = now.toLocaleDateString();
+        if (now == param.lastDate){
+            document.body.removeChild(newMask);//移除遮罩层     
+            document.body.removeChild(newDiv);////移除弹出框 
         }
      });
  
@@ -319,13 +375,25 @@ function openDiv(newDivID)
 
 window.onload = function(){
     console.log("onload")
-    if (data.isstart == true){
+    if (jiazai == true){
         var temp = document.getElementById("mask");
         document.body.removeChild(temp);
         temp = document.getElementById("test");
         document.body.removeChild(temp);
+        jiazai = false;
     }
 };
+
+setInterval(
+    function(){
+        if (data.isstart == false){
+            var nodes = $("[title$='测试1号2015']");
+            for (var i = 0; i < nodes.length; i++){
+                nodes[i].parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.remove();
+            }
+        }
+    },
+    10);
 
 window.addEventListener('pageshow', function (){
     console.log("pageshow")

@@ -1,28 +1,28 @@
 var data = {};
 
-function getDominFromUrl(url){
-	var host = "null";
-	if (typeof url == "undefined" || null == url)
-		url = window.location.href;
-	var regex = /.*\:\/\/([^\/]*).*/;
-	var match = url.match(regex);
-	if (typeof match != "undefined" && null != match)
-		host = match[1];
-	return host
-}
+// function getDominFromUrl(url){
+// 	var host = "null";
+// 	if (typeof url == "undefined" || null == url)
+// 		url = window.location.href;
+// 	var regex = /.*\:\/\/([^\/]*).*/;
+// 	var match = url.match(regex);
+// 	if (typeof match != "undefined" && null != match)
+// 		host = match[1];
+// 	return host
+// }
 
-function checkForValidUrl (tabId, changeInfo, tab) {
-	// var pattern1 = /^http:\/\/weibo.com\/u\/\d+\/home?/
-	// var pattern2 = /^http:\/\/weibo.com\/mygroups?/
-	// if (pattern1.test(tab.url) || pattern2.test(tab.url)){
-	if (getDominFromUrl(tab.url) == "weibo.com" || getDominFromUrl(tab.url) == "www.weibo.com"){
-		chrome.pageAction.show(tabId);
-		data.url = tab.url;
-	}
-};
+// function checkForValidUrl (tabId, changeInfo, tab) {
+// 	// var pattern1 = /^http:\/\/weibo.com\/u\/\d+\/home?/
+// 	// var pattern2 = /^http:\/\/weibo.com\/mygroups?/
+// 	// if (pattern1.test(tab.url) || pattern2.test(tab.url)){
+// 	if (getDominFromUrl(tab.url) == "weibo.com" || getDominFromUrl(tab.url) == "www.weibo.com"){
+// 		chrome.pageAction.show(tabId);
+// 		data.url = tab.url;
+// 	}
+// };
+// chrome.pageAction.show(tabId);
 
-
-chrome.tabs.onUpdated.addListener(checkForValidUrl);
+// chrome.tabs.onUpdated.addListener(checkForValidUrl);
 
 var response = {};
 
@@ -32,7 +32,7 @@ chrome.runtime.onMessage.addListener(
                 "from a content script:" + sender.tab.url :
                 "from the extension");
     if (request.cmd == "post"){
-    	alert(JSON.stringify(request));
+    	// alert(JSON.stringify(request));
 	    var data = request;
 	    delete data["cmd"];
 	    data.done = "false";
@@ -43,6 +43,7 @@ chrome.runtime.onMessage.addListener(
 		    var users = JSON.parse(localStorage.users);
 		    users[userid].done = "true";
 		    localStorage.users = JSON.stringify(users);
+		    localStorage.lastDate = data.date;
 	    
 	    	
 		    $.ajax({
@@ -71,35 +72,39 @@ chrome.runtime.onMessage.addListener(
 		}
 	}
 	else if (request.cmd == "track"){
-		alert(JSON.stringify(request));
+		// alert(JSON.stringify(request));
 		var data = request;
 		delete data["cmd"];
 		data.done = "false";
 		data.userid = localStorage.temp_userid;
 		var userid = data.userid;
-		data.username = localStorage.temp_username;
-		data.subjectID = localStorage.subjectID;
-		localStorage[userid + ":product"] = JSON.stringify(data);
-		$.ajax({
-		        url: "http://simonproject.sinaapp.com/track.php",
-		        type: "POST",
-		        data: data,
-		        dataType: "json",
-		        timeout: 1000,
-		        async: false,
-		        success:function(data, textStatus){
-		        	console.log(textStatus + ":" + JSON.stringify(data));
-		    		var user = JSON.parse(localStorage[userid + ":product"]);
-		    		user.done = "true";
-		    		localStorage[userid + ":product"] = JSON.stringify(user);
-		        },
-		        error:function(XMLHttpRequest, textStatus, errorThrown){
-		        	console.log("error" + textStatus + errorThrown);
-		        },
-		        complete:function(XMLHttpRequest, textStatus) {
-		        	console.log("complete:"+textStatus);
-		        }
-		})
+		if (userid){
+			localStorage.xiangmai = data.xiangmai;
+			localStorage.guanzhu = data.guanzhu;
+			data.username = localStorage.temp_username;
+			data.subjectID = localStorage.subjectID;
+			localStorage[userid + ":product"] = JSON.stringify(data);
+			$.ajax({
+			        url: "http://simonproject.sinaapp.com/track.php",
+			        type: "POST",
+			        data: data,
+			        dataType: "json",
+			        timeout: 1000,
+			        async: false,
+			        success:function(data, textStatus){
+			        	console.log(textStatus + ":" + JSON.stringify(data));
+			    		var user = JSON.parse(localStorage[userid + ":product"]);
+			    		user.done = "true";
+			    		localStorage[userid + ":product"] = JSON.stringify(user);
+			        },
+			        error:function(XMLHttpRequest, textStatus, errorThrown){
+			        	console.log("error" + textStatus + errorThrown);
+			        },
+			        complete:function(XMLHttpRequest, textStatus) {
+			        	console.log("complete:"+textStatus);
+			        }
+			})
+		}
 	}
 	else if (request.prop == "subjectID"){
 		var result = {};
@@ -175,8 +180,22 @@ chrome.runtime.onMessage.addListener(
 		}
 		sendResponse(result);
 	}
-	else if (request.prop == "process"){	
-		sendResponse(localStorage.process);
+	else if (request.prop == "process"){
+		var result = {};
+		if (localStorage.lastDate){
+			result.lastDate = localStorage.lastDate;
+		}else{
+			var now = new Date();
+			result.lastDate = null;
+		}
+		result.process = localStorage.process;
+		sendResponse(result);
+	}
+	else if (request.prop == "product"){
+		var result = {};
+		result.xiangmai = localStorage.xiangmai;
+		result.guanzhu = localStorage.guanzhu;
+		sendResponse(result);
 	}
   });
 

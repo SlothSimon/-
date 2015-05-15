@@ -16,6 +16,12 @@ var data = {
 // window.onpageshow = function () {
     console.log("track");
 
+    function getItem(item,callback){
+      chrome.runtime.sendMessage({prop:item},function(response){
+            callback(response);
+      });
+    }
+
     for (var i=0;i < 2; i++){
         var element = document.getElementsByClassName("unfancied")[i];
         element.onclick = function(){
@@ -63,6 +69,22 @@ var data = {
         data.cmd = "track";
         chrome.runtime.sendMessage(data);
     };
+
+   getItem("product", function(param){
+        if (param.xiangmai == "true")
+            for (var i=0;i < 2; i++){
+                var element = document.getElementsByClassName("unfancied")[i];
+                element.click();
+                break;
+            }
+        if (param.guanzhu == "true")
+            for (var i=0;i < 2; i++){
+                var element = document.getElementsByClassName("unowned")[i];
+                element.click();
+                break;
+            }
+
+    });
 
 
 // }

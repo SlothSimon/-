@@ -9,21 +9,142 @@
 // var port = "";
 
 window.addEventListener('pageshow', function (){
-	var users = JSON.parse(localStorage.users);
-	var process = 0;
-	for (var userid in users){
-		var user = users[userid];
+	if (localStorage.users){
+		var users = JSON.parse(localStorage.users);
+		var process = 0;
+		var upload = {};
+		for (var userid in users){
+			var user = users[userid];
 			if (user.done == "true"){
 				process++;
 			}
+			var cont = localStorage[userid];
+			if (cont){
+				cont = JSON.parse(cont);
+				if (cont.done == "false")
+					upload[userid] = cont;
+			}
+			cont = localStorage[userid + ":product"];
+			if (cont){
+				cont = JSON.parse(cont);
+				if (cont.done == "false")
+					upload[userid + ":product"] = cont;
+			}
+		}
+		localStorage.process = process;
+		document.getElementsByClassName("process")[0].text = "实验进度： " + localStorage.process + " / 5";
+	}else{
+		var process = document.getElementsByClassName("process")[0]
+		process.text = "被试测试数据尚未录入！点击报错！";
+		process.href = "#";
+		process.style.color = "red";
+		data = {title:"No subject's users data！", content:localStorage.subjectID};
+		console.log(JSON.stringify(data));
+		process.onclick = function(){
+			$.ajax({
+		        url: "http://simonproject.sinaapp.com/email/errormail.php",
+		        type: "POST",
+		        data: data,
+		        dataType: "json",
+		        timeout: 1000,
+		        async: false,
+		        success:function(data, textStatus){
+		        	console.log(textStatus + ":" + JSON.stringify(data));
+		        	process.text = data;
+		        },
+		        error:function(XMLHttpRequest, textStatus, errorThrown){
+		        	console.log("error" + textStatus + errorThrown);
+		        	process.text = "报错失败，请使用用户反馈！";
+		        },
+		        complete:function(XMLHttpRequest, textStatus) {
+		        	console.log("complete:"+textStatus);
+		        	// alert("第"+n+"个数据上传失败！");
+				        }
+		    })
+		}
+		upload = {};
 	}
-	localStorage.process = process;
 	
 	document.getElementsByClassName("js-account")[0].text = "被试ID： " + localStorage.subjectID;
-	document.getElementsByClassName("process")[0].text = "实验进度： " + localStorage.process + " / 5";
+	if (Object.keys(upload).length > 0){
+		var btn_upload = document.getElementsByClassName("upload")[0];
+		btn_upload.innerHTML = "有" + Object.keys(upload).length + "个未上传数据，点击上传";
+		btn_upload.onclick = function(){
+			var re = /product/;
+			var n = 1;
+			for (var key in upload){
+				if (re.test(key) == false){
+					btn_upload.innerHTML += "<br>正在上传...";
+					$.ajax({
+				        url: "http://simonproject.sinaapp.com/test.php",
+				        type: "POST",
+				        data: upload[key],
+				        dataType: "json",
+				        timeout: 1000,
+				        async: false,
+				        success:function(data, textStatus){
+				        	console.log(textStatus + ":" + JSON.stringify(data));
+				        	if (data.result == true){
+					    		var user = JSON.parse(localStorage[key]);
+					    		user.done = "true";
+					    		localStorage[key] = JSON.stringify(key);
+					    		btn_upload.innerHTML += "<br>第"+n+"个数据上传成功！";
+					    	}
+				        },
+				        error:function(XMLHttpRequest, textStatus, errorThrown){
+				        	console.log("error" + textStatus + errorThrown);
+				        	btn_upload.innerHTML += "<br>第"+n+"个数据上传失败！";
+				        },
+				        complete:function(XMLHttpRequest, textStatus) {
+				        	console.log("complete:"+textStatus);
+				        	// alert("第"+n+"个数据上传失败！");
+				        }
+				    })
+				}else{
+					btn_upload.innerHTML += "<br>正在上传...";
+					$.ajax({
+				        url: "http://simonproject.sinaapp.com/track.php",
+				        type: "POST",
+				        data: upload[key],
+				        dataType: "json",
+				        timeout: 1000,
+				        async: false,
+				        success:function(data, textStatus){
+				        	console.log(textStatus + ":" + JSON.stringify(data));
+				    		var user = JSON.parse(localStorage[key]);
+				    		user.done = "true";
+				    		localStorage[key] = JSON.stringify(user);
+				    		btn_upload.innerHTML += "<br>第"+n+"个数据上传成功！";
+				        },
+				        error:function(XMLHttpRequest, textStatus, errorThrown){
+				        	console.log("error" + textStatus + errorThrown);
+				        	btn_upload.innerHTML += "<br>第"+n+"个数据上传失败！";
+				        },
+				        complete:function(XMLHttpRequest, textStatus) {
+				        	console.log("complete:"+textStatus);
+				        	// alert("第"+n+"个数据上传失败！");
+				        }
+					})
+				}
+				n++;
+			}
+		};
+		btn_upload.parentNode.style.display = "block";
+	}
+	if (Object.keys(upload).length == 0 && process == 5){
+		var btn_upload = document.getElementsByClassName("upload")[0];
+		btn_upload.innerHTML = "实验全部完成，点击填写问卷";
+		btn_upload.href = "http://www.sojump.com/jq/5004012.aspx";
+		btn_upload.target = "_blank";
+		btn_upload.parentNode.style.display = "block";
+	}
 	document.getElementById("addAccount").onclick = function (){
 		localStorage.removeItem("subjectID");
 		localStorage.removeItem("group");
+		localStorage.removeItem("lastDate");
+		localStorage.removeItem("temp_userid");
+		localStorage.removeItem("temp_username");
+		localStorage.removeItem("users");
 		self.location = "login.html";
 	};
 	document.getElementsByClassName("line1")[0].focus();
