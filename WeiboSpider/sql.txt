@@ -1,0 +1,23 @@
+------------------------------------------------------------
+insert into `subject` ( `ID`, `password`, `group`, `name`) values (1111111111, None, 1, '匿名');
+insert into `relation` ( `subjectID`, `username`, `userid`, `type`) values (1111111111, '谷大白话', '1788911247', 'vip');
+insert into `relation` ( `subjectID`, `username`, `userid`, `type`) values (1111111111, '使徒子', '1771140437', 'vip');
+insert into `relation` ( `subjectID`, `username`, `userid`, `type`) values (1111111111, '马伯庸', '1444865141', 'vip');
+insert into `relation` ( `subjectID`, `username`, `userid`, `type`) values (1111111111, 'fall_ark', '1678843974', 'vip');
+insert into `relation` ( `subjectID`, `username`, `userid`, `type`) values (1111111111, '潘海天', '1074974723', 'vip');
+1111111111 韩笑and幽寂
+1111111111 决绝的鱼
+1111111111 琥珀凝光
+1111111111 Duskblaze
+1111111111 刘露瞳
+insert into `subject` ( `ID`, `password`, `group`, `name`) values (1111111112, None, 2, '匿名');
+insert into `relation` ( `subjectID`, `username`, `userid`, `type`) values (1111111112, '张德芬', '1759168351', 'vip');
+insert into `relation` ( `subjectID`, `username`, `userid`, `type`) values (1111111112, '马伊琍', '1196235387', 'vip');
+insert into `relation` ( `subjectID`, `username`, `userid`, `type`) values (1111111112, '文章同學', '1212812142', 'vip');
+insert into `relation` ( `subjectID`, `username`, `userid`, `type`) values (1111111112, '王力宏', '1793285524', 'vip');
+insert into `relation` ( `subjectID`, `username`, `userid`, `type`) values (1111111112, '毕淑敏', '1374834850', 'vip');
+insert into `relation` ( `subjectID`, `username`, `userid`, `type`) values (1111111112, '永锡', '1647130145', 'friend');
+1111111112 小郭在微笑
+1111111112 禾白晓撇
+1111111112 罗汉果泡茶什么的很好喝
+1111111112 牛肉饭粒
